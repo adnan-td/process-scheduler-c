@@ -1,20 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "process.h"
+#include "linkedlist.c"
 
 #define MAX_PROCESS 10
-
-typedef struct
-{
-  int name;
-  int arrival_time;
-  int burst_time;
-  int remaining_bt;
-  int start_time;
-  int priority;
-  int tat;
-  int wt;
-} Process;
 
 int compareProcessesByAT(const void *a, const void *b)
 {
@@ -78,22 +68,24 @@ void calculateAverageTimes(Process processes[], int p, float *avg_tat, float *av
   *avg_wt = (float)total_wt / p;
 }
 
-void printGanttChart(Process processes[], int p)
+void printGanttChart(LinkedListNode *head)
 {
   printf("Gantt Chart:\n");
-  for (int i = 0; i < p; i++)
+
+  LinkedListNode *current = head;
+  while (current != NULL)
   {
-    printf("| P%d\t", processes[i].name);
+    printf("| P%d\t", current->process.name);
+    current = current->next;
   }
   printf("|");
   printf("\n");
-
-  int total_time = 0;
-  printf("%d\t", total_time);
-  for (int i = 0; i < p; i++)
+  printf("%d\t", 0);
+  current = head;
+  while (current != NULL)
   {
-    total_time += processes[i].burst_time;
-    printf("%d\t", total_time);
+    printf("%d\t", current->value);
+    current = current->next;
   }
   printf("\n\n");
 }
