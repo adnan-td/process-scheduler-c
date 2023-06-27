@@ -6,6 +6,14 @@
 
 #define MAX_PROCESS 10
 
+int compareProcessesByName(const void *a, const void *b)
+{
+  const Process *processA = (const Process *)a;
+  const Process *processB = (const Process *)b;
+
+  return processA->name - processB->name;
+}
+
 int compareProcessesByAT(const void *a, const void *b)
 {
   const Process *processA = (const Process *)a;
@@ -102,6 +110,7 @@ void printProcessTable(Process processes[], int p)
 
 void printProcessAfterTable(Process processes[], int p)
 {
+  qsort(processes, p, sizeof(Process), compareProcessesByName);
   printf("Process  \t WT \t TAT\n");
   for (int i = 0; i < p; i++)
   {

@@ -1,5 +1,25 @@
 #include "queue.c"
 
+int func(Process processes[], int index, Process cur, int current_time, LinkedListNode **g, Queue *q)
+{
+  cur.start_time = current_time;
+  while (cur.remaining_bt--)
+  {
+    while (!isQueueEmpty(q) && (q->front->data.burst_time < cur.burst_time && q->front->data.arrival_time <= current_time))
+    {
+      insertNode(g, current_time, cur);
+      Process p = dequeue(q);
+      current_time = func(processes, p.name - 1, p, current_time, g, q);
+    }
+    current_time++;
+  }
+  cur.tat = current_time - cur.arrival_time;
+  cur.wt = cur.tat - cur.burst_time;
+  processes[index] = cur;
+  insertNode(g, current_time, cur);
+  return current_time;
+}
+
 LinkedListNode *calculateTimes(Process *processes, int p)
 {
   qsort(processes, p, sizeof(Process), compareProcessesByBT);
@@ -21,32 +41,17 @@ LinkedListNode *calculateTimes(Process *processes, int p)
     {
       while (!isQueueEmpty(&q) && (q.front->data.burst_time < cur.burst_time && q.front->data.arrival_time <= current_time))
       {
-        Process frontProcess = dequeue(&q);
-        frontProcess.start_time = current_time;
-        frontProcess.wt = current_time - frontProcess.arrival_time;
-        frontProcess.tat = frontProcess.wt + frontProcess.burst_time;
-        current_time += frontProcess.burst_time;
-        processes[frontProcess.name - 1] = frontProcess;
-        insertNode(&g, current_time, frontProcess);
+        Process p = dequeue(&q);
+        current_time = func(processes, p.name - 1, p, current_time, &g, &q);
       }
-      cur.start_time = current_time;
-      cur.wt = current_time - cur.arrival_time;
-      cur.tat = cur.wt + cur.burst_time;
-      current_time += cur.burst_time;
-      processes[i] = cur;
-      insertNode(&g, current_time, processes[i]);
+      current_time = func(processes, i, cur, current_time, &g, &q);
     }
   }
 
   while (!isQueueEmpty(&q))
   {
-    Process frontProcess = dequeue(&q);
-    frontProcess.start_time = current_time;
-    frontProcess.wt = current_time - frontProcess.arrival_time;
-    frontProcess.tat = frontProcess.wt + frontProcess.burst_time;
-    current_time += frontProcess.burst_time;
-    processes[frontProcess.name - 1] = frontProcess;
-    insertNode(&g, current_time, frontProcess);
+    Process p = dequeue(&q);
+    current_time = func(processes, p.name - 1, p, current_time, &g, &q);
   }
 
   return g;
@@ -66,6 +71,7 @@ int main()
   LinkedListNode *g = calculateTimes(processes, p);
   printProcessAfterTable(processes, p);
 
+  // displayList(g);
   calculateAverageTimes(processes, p, &avg_tat, &avg_wt);
   printGanttChart(g);
   printf("Average TAT  = %.2f\n", avg_tat);
