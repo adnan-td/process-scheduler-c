@@ -33,7 +33,6 @@ int main()
   printProcessAfterTable(processes, p);
 
   calculateAverageTimes(processes, p, &avg_tat, &avg_wt);
-  displayList(g);
   printGanttChart(g);
   printf("Average TAT  = %.2f\n", avg_tat);
   printf("Average WT   = %.2f\n", avg_wt);
